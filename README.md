@@ -49,19 +49,4 @@ Este projeto contém o notebook `trabalho_otimizacao.ipynb`, o relatório em LaT
    - Seções de experimentos extras (sensibilidade em N, checkpoints, penalização, biblioteca de pistas).
 3. Caso o IPOPT não seja encontrado, ajuste o caminho ou instale o solver antes de prosseguir.
 
-## Observações e sugestões
-
-- Rode o notebook completo antes de gerar o relatório final para garantir gráficos atualizados.
-- Use o relatório em LaTeX/PDF (`relatorio_otimizacao.tex` / `.pdf`) para documentação formal.
-- Adapte o modelo facilmente: basta alterar restrições ou pesos na função objetivo (exemplos já incluídos nas seções extras).
-
-## Empacotamento para envio
-
-Ao criar um `.zip` para compartilhar:
-1. Inclua `trabalho_otimizacao.ipynb`, `requirements.txt`, `relatorio_otimizacao.tex` e `Relatorio_Otimizacao.pdf`, além deste `README.md`.
-2. Informe ao revisor/professor:
-   - Instalar dependências Python com `pip install -r requirements.txt`.
-   - Instalar o IPOPT com `conda install -c conda-forge ipopt` (ou fornecer o executável).
-   - Ajustar o caminho do executável IPOPT se necessário.
-
 Seguindo esses passos, qualquer usuário com Python e Conda conseguirá reproduzir os resultados do notebook e do relatório.***
