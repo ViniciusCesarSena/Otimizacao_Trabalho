@@ -1,70 +1,67 @@
-# Trabalho de Otimizacao - Minimizacao de Energia de Trajetoria
+# Trabalho de Otimização – Minimização de Energia de Trajetória
 
-Este projeto apresenta um notebook (`trabalho_otimizacao.ipynb`) que demonstra como formular e resolver, com Pyomo e IPOPT, o problema de minimizar a energia consumida por um robo que percorre um plano entre os pontos (0,0) e (10,10). A energia e aproximada via integracao trapezoidal do termo `v(t)^2 + sin(t)`. Alem do caso base, o notebook inclui experimentos extras com diferentes discretizacoes, restricoes personalizadas, biblioteca de “pistas” (cenarios de trajeto) e uma animacao da trajetoria escolhida como mais eficiente.
+Este projeto contém o notebook `trabalho_otimizacao.ipynb`, o relatório em LaTeX/PDF e arquivos auxiliares que mostram como modelar e resolver, com Pyomo e IPOPT, a trajetória de um robô do ponto (0,0) ao ponto (10,10) minimizando o consumo de energia. Além do caso base, o notebook explora variações como checkpoints intermediários, penalizações adicionais e comparação entre “pistas” alternativas.
 
-## Estrutura
+## Estrutura do diretório
 
-- `trabalho_otimizacao.ipynb` – Notebook principal, organizado em:
-  - Preparacao do ambiente e importacao de bibliotecas.
-  - Modelagem Pyomo do problema original.
-  - Resolucao com IPOPT e avaliacao grafica.
-  - Experimentos extras:
-    - Sensibilidade ao numero de intervalos.
-    - Checkpoint intermediario obrigatório.
-    - Funcao objetivo com penalizacao adicional.
-  - Biblioteca de pistas personalizadas (linha direta, checkpoint central, corredor guiado) e comparacao de resultados.
-  - Animacao da melhor trajetoria encontrada.
-- `Relatorio_Otimizacao.pdf` – Relatorio tecnico (PDF) com descricao do problema, formulacao, justificativa do solver e analise dos resultados.
-- `Miniconda3-latest-Windows-x86_64.exe` – Instalador usado para disponibilizar o solver IPOPT (mantido caso seja necessario reinstalar).
-- `.venv/` (opcional) – Ambiente virtual local criado pelo usuario.
+- `trabalho_otimizacao.ipynb` – Notebook principal com modelagem, solução e visualizações.
+- `relatorio_otimizacao.tex` / `Relatorio_Otimizacao.pdf` – Relatório técnico.
+- `requirements.txt` – Lista mínima de dependências Python (pip).
+- `Miniconda3-latest-Windows-x86_64.exe` (opcional) – Instalador utilizado para garantir o IPOPT.
+- `.venv/` (opcional) – Ambiente virtual criado localmente.
+- Outros arquivos auxiliares (ex.: scripts temporários, animações geradas).
 
-## Pre-requisitos
+## Pré-requisitos
 
 - Python 3.10 ou superior.
 - Pip atualizado (`pip`, `setuptools`, `wheel`).
-- Pacotes Python: `numpy`, `scipy`, `matplotlib`, `pyomo`.
-- Solver IPOPT disponivel (recomendado: instalacao via Miniconda).
+- Dependências Python listadas em `requirements.txt`:  
+  `numpy`, `scipy`, `matplotlib`, `pyomo`, `ply`, `ipykernel`, `fpdf`.
+- Solver IPOPT acessível no sistema (instalação recomendada via Miniconda/Conda).
 
-## Preparando o ambiente
+## Configurando o ambiente
 
-1. **Dependencias via pip**  
-   A primeira celula do notebook automatiza esta etapa chamando `pip install -r requirements.txt`, mas e possivel executar manualmente:
+1. **Instalar dependências Python**  
+   No terminal (PowerShell/CMD):
    ```bash
    python -m pip install --upgrade pip setuptools wheel
    python -m pip install -r requirements.txt
    ```
+   A primeira célula do notebook também executa esse processo; se algum pacote falhar, ela tenta instalá-lo individualmente e emite avisos.
 
-2. **Instalando o IPOPT**  
-   Com Miniconda:
+2. **Instalar o IPOPT via Conda (recomendado)**  
    ```bash
    conda install -y -c conda-forge ipopt
    ```
-   O notebook aponta para `C:\Users\<usuario>\miniconda3\Library\bin\ipopt.exe`. Ajuste a variavel `ipopt_exec` se o solver estiver em outro local.
+   Por padrão, o notebook aponta para `C:\Users\<usuario>\miniconda3\Library\bin\ipopt.exe`. Caso o executável esteja em outro local, ajuste a variável `ipopt_exec` na célula onde o solver é criado, por exemplo:
+   ```python
+   ipopt_exec = Path(r'C:\caminho\para\ipopt.exe')
+   ```
+   Em Linux/macOS, garanta que o binário `ipopt` esteja no PATH ou forneça o caminho absoluto correto.
 
 ## Executando o notebook
 
-1. Abra o diretorio `Otimizacao_Trabalho` no Jupyter Notebook ou JupyterLab.
-2. Execute as celulas na ordem em que aparecem:
-   - Preparacao do ambiente.
-   - Modelagem Pyomo do caso base.
-   - Resolucao com IPOPT e graficos iniciais.
-   - Se desejado, rode as seções “Experimentos extras” e “Biblioteca de pistas personalizadas” para comparar cenarios.
-   - A ultima seção gera uma animacao da trajetoria mais eficiente encontrada (requer que os cenarios tenham sido executados antes).
+1. Abra o diretório no Jupyter Notebook ou JupyterLab.
+2. Execute as células em ordem:
+   - Preparação do ambiente (instalação de dependências).
+   - Modelagem e solução do caso base com IPOPT.
+   - Células de visualização (gráficos e animações).
+   - Seções de experimentos extras (sensibilidade em N, checkpoints, penalização, biblioteca de pistas).
+3. Caso o IPOPT não seja encontrado, ajuste o caminho ou instale o solver antes de prosseguir.
 
-## Exploracoes adicionais
+## Observações e sugestões
 
-- **Sensibilidade em N** – Avalia como o refinamento da discretizacao altera a energia e a trajetoria.
-- **Checkpoint intermediario** – Simula missao que exige visitar um ponto especifico no meio do percurso.
-- **Penalizacao alternativa** – Ajusta a funcao objetivo para privilegiar aproximacao progressiva ao destino.
-- **Pistas personalizadas** – Permite comparar automaticamente diferentes configuracoes de restricoes, mostrando energia, condicao do solver e graficos sobrepostos.
-- **Animacao** – Gera uma visualizacao dinamica do caminho selecionado como melhor.
+- Rode o notebook completo antes de gerar o relatório final para garantir gráficos atualizados.
+- Use o relatório em LaTeX/PDF (`relatorio_otimizacao.tex` / `.pdf`) para documentação formal.
+- Adapte o modelo facilmente: basta alterar restrições ou pesos na função objetivo (exemplos já incluídos nas seções extras).
 
-## Sugestoes de uso
+## Empacotamento para envio
 
-- Rodar o notebook por completo quando for apresentar resultados, garantindo que as figuras e animacoes estejam atualizadas.
-- Exportar graficos ou capturas de tela das pistas e da animacao para incluir em relatorios ou apresentações.
-- Ajustar peso de penalizacoes, posicoes dos checkpoints ou limites do corredor para adaptar o estudo a outros cenarios de navegação.
+Ao criar um `.zip` para compartilhar:
+1. Inclua `trabalho_otimizacao.ipynb`, `requirements.txt`, `relatorio_otimizacao.tex` e `Relatorio_Otimizacao.pdf`, além deste `README.md`.
+2. Informe ao revisor/professor:
+   - Instalar dependências Python com `pip install -r requirements.txt`.
+   - Instalar o IPOPT com `conda install -c conda-forge ipopt` (ou fornecer o executável).
+   - Ajustar o caminho do executável IPOPT se necessário.
 
-## Contato
-
-Trabalho desenvolvido por Guilherme Fernandes Monteiro (RA 22403229) para a disciplina de Otimizacao. Qualquer duvida pode ser direcionada ao autor conforme as orientacoes da disciplina.
+Seguindo esses passos, qualquer usuário com Python e Conda conseguirá reproduzir os resultados do notebook e do relatório.***

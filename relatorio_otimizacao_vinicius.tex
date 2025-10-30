@@ -1,0 +1,159 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+
+\title{Trabalho de Otimizacao\\Relatorio Tecnico}
+\author{Vinicius Cesar Sena Torres (RA 22409225)}
+\date{25 de Outubro de 2025}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. Introducao}
+Este relatorio descreve a resolucao do problema de levar um robo do ponto inicial $(0,0)$ ao ponto final $(10,10)$ no intervalo continuo $t \in [0,5]$, minimizando a energia acumulada ao longo do percurso. A energia integra o quadrado da velocidade instantanea somado ao termo $\sin(t)$. O problema foi formulado como um Problema de Programacao Nao Linear (NLP), modelado com Pyomo e resolvido com o solver IPOPT.
+
+Os objetivos principais foram:
+\begin{itemize}
+    \item Formular matematicamente o problema continuo e sua versao discretizada.
+    \item Implementar o modelo no Pyomo.
+    \item Resolver o problema com IPOPT e analisar os resultados.
+    \item Registrar os achados e discutir possiveis extensoes.
+\end{itemize}
+
+\section*{2. Formulacao Matematica}
+\subsection*{2.1 Problema continuo}
+A energia a minimizar e dada por:
+\[
+E = \int_{0}^{5} \left( v(t)^2 + \sin(t) \right) \, dt,
+\]
+onde $v(t) = \sqrt{\dot{x}(t)^2 + \dot{y}(t)^2}$.
+
+As restricoes de contorno sao:
+\[
+x(0) = 0, \quad y(0) = 0, \qquad x(5) = 10, \quad y(5) = 10.
+\]
+
+\subsection*{2.2 Discretizacao}
+O intervalo $[0,5]$ foi dividido em $N = 5$ subintervalos uniformes. Define-se $t_i = i \cdot \Delta t$ com $\Delta t = 1$ e $i = 0,1,\ldots,5$.
+
+\subsection*{2.3 Modelo discretizado}
+Para cada ponto $t_i$ determinam-se variaveis $x_i$ e $y_i$. A energia aproximada pela regra dos trapezios resulta em:
+\[
+E \approx \sum_{i=0}^{N-1} \frac{1}{2} \left[ \left( v_i^2 + \sin(t_i) \right) + \left( v_{i+1}^2 + \sin(t_{i+1}) \right) \right] \Delta t,
+\]
+com
+\[
+v_i^2 = \left( \frac{x_{i+1} - x_i}{\Delta t} \right)^2 + \left( \frac{y_{i+1} - y_i}{\Delta t} \right)^2.
+\]
+
+As condicoes de contorno discretas permanecem $x_0 = 0$, $y_0 = 0$, $x_N = 10$, $y_N = 10$.
+
+\section*{3. Justificativa do Solver IPOPT}
+O IPOPT (Interior Point OPTimizer) foi escolhido por:
+\begin{itemize}
+    \item Ser especializado em problemas nao lineares suaves com restricoes de igualdade e desigualdade.
+    \item Utilizar metodos de pontos interiores estaveis e com boa taxa de convergencia.
+    \item Integrar-se nativamente ao Pyomo, dispensando codificacao manual de derivadas.
+    \item Operar como software livre, com desempenho comparavel a solvers comerciais.
+\end{itemize}
+
+\section*{4. Implementacao em Pyomo}
+O modelo foi implementado com:
+\begin{itemize}
+    \item \textbf{ConcreteModel} para representar o problema.
+    \item \textbf{RangeSet} para indices de tempo.
+    \item \textbf{Var} para coordenadas $x_i$ e $y_i$.
+    \item Uma funcao objetivo Python que computa a energia via regra dos trapezios.
+    \item \textbf{SolverFactory('ipopt')} apontando para o executavel instalado via Miniconda.
+\end{itemize}
+
+\section*{5. Resultados do Caso Base ($N = 5$)}
+\subsection*{5.1 Diagnostico do solver}
+O IPOPT retornou status \texttt{ok} com condicao de parada \texttt{optimal}. A energia minimizada foi:
+\[
+E^\ast = 35.949741.
+\]
+
+\subsection*{5.2 Trajetoria otima}
+A trajetoria obtida e quase linear, conforme a Tabela~\ref{tab:trajetoria}. As coordenadas $x_i$ e $y_i$ sao praticamente iguais, indicando trajeto proximo da diagonal $y = x$.
+
+\begin{table}[H]
+    \centering
+    \caption{Posicoes otimas no caso base}
+    \label{tab:trajetoria}
+    \begin{tabular}{ccc}
+        \toprule
+        Tempo (s) & $x_i$ & $y_i$ \\
+        \midrule
+        0.0 & 0.000000 & 0.000000 \\
+        1.0 & 3.529412 & 3.529412 \\
+        2.0 & 5.294118 & 5.294118 \\
+        3.0 & 7.058824 & 7.058824 \\
+        4.0 & 8.823529 & 8.823529 \\
+        5.0 & 10.000000 & 10.000000 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection*{5.3 Interpretacao}
+\begin{itemize}
+    \item O termo dominante da energia e $v^2$; $\sin(t)$ introduz pequenas correcoes.
+    \item A trajetoria linear uniforme e energeticamente eficiente para ligar os pontos extremos sem outras restricoes.
+    \item A convergencia ocorreu sem violacoes, confirmando a adequacao do solver e do modelo.
+\end{itemize}
+
+\section*{6. Conclusoes do Caso Base}
+\begin{itemize}
+    \item A combinacao Pyomo + IPOPT resolve o problema de forma direta e robusta.
+    \item O caminho quase retilineo confirma a intuicao fisica de menor distancia com custo quadratico de velocidade.
+    \item As condicoes de contorno e relacoes de velocidade foram satisfeitas exatamente.
+    \item O modelo serve de base para adicionar novas restricoes ou funcoes objetivo.
+\end{itemize}
+
+\section*{7. Experimentos Extras}
+Apos validar o caso base foram conduzidas variacoes para analisar sensibilidades e restricoes adicionais.
+
+\subsection*{7.1 Sensibilidade ao refinamento temporal}
+O intervalo $[0,5]$ foi subdividido com diferentes numeros de subintervalos $N$. A Tabela~\ref{tab:sensibilidade} mostra a energia obtida em cada caso. Mesmo com energia ligeiramente crescente (devido ao termo $\sin(t)$ ser avaliado em mais pontos positivos), a trajetoria permanece essencialmente linear.
+
+\begin{table}[H]
+    \centering
+    \caption{Energia em funcao do refinamento temporal}
+    \label{tab:sensibilidade}
+    \begin{tabular}{cc}
+        \toprule
+        Subintervalos ($N$) & Energia \\
+        \midrule
+        5  & 35.9497 \\
+        10 & 38.2014 \\
+        20 & 39.4223 \\
+        40 & 40.0597 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection*{7.2 Checkpoint intermediario}
+Ao impor a passagem pelo ponto $(5,6)$ no instante $t = 2.5$, a energia sobe para 36.364 unidades (acrescimo aproximado de $1{,}2\%$). A trajetoria desvia temporariamente da diagonal para satisfazer a restricao, ilustrando cenarios com inspecoes ou paradas obrigatorias.
+
+\subsection*{7.3 Penalizacao adicional}
+Incluiu-se um termo $0.01[(x_i-10)^2 + (y_i-10)^2]$ na funcao objetivo, incentivando aproximacao precoce ao destino. A energia resultante foi 39.390 unidades. As coordenadas intermediarias ficam mais proximas de $(10,10)$, o que pode ser desejavel para manter o robo sob cobertura de comunicacao ou sensores.
+
+\subsection*{7.4 Biblioteca de pistas}
+Foram comparadas tres configuracoes padronizadas:
+\begin{itemize}
+    \item \textbf{Linha direta:} modelo original, energia de 35.950 unidades.
+    \item \textbf{Checkpoint central:} obrigatoriedade em $(5,6)$, energia de 36.364 unidades.
+    \item \textbf{Corredor guiado:} restricoes $-1.5 \leq y - x \leq 1.5$ e penalizacao leve, energia de 43.080 unidades.
+\end{itemize}
+Os resultados (energias, status do solver e trajetorias) estao registrados graficamente no notebook, evidenciando o trade-off entre liberdade geometrica e custo energetico.
+
+\subsection*{7.5 Visualizacao animada}
+A trajetoria de menor energia entre as pistas comparadas foi animada para facilitar a apresentacao. A animacao destaca a progressao temporal do robo e auxilia em defesas do trabalho ou em comunicacao com clientes.
+
+Esses experimentos mostram que a formulacao e flexivel e suporta demandas adicionais sem perda de robustez numerica.
+
+\end{document}
