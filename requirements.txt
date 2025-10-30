@@ -1,0 +1,7 @@
+numpy==2.2.4
+scipy==1.16.2
+matplotlib==3.10.3
+pyomo==6.9.5
+ply==3.11
+ipykernel==6.29.5
+fpdf==1.7.2
