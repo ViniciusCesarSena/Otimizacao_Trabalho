@@ -49,4 +49,5 @@ Este projeto contém o notebook `trabalho_otimizacao.ipynb`, o relatório em LaT
    - Seções de experimentos extras (sensibilidade em N, checkpoints, penalização, biblioteca de pistas).
 3. Caso o IPOPT não seja encontrado, ajuste o caminho ou instale o solver antes de prosseguir.
 
-Seguindo esses passos, qualquer usuário com Python e Conda conseguirá reproduzir os resultados do notebook e do relatório.***
+***Seguindo esses passos, qualquer usuário com Python e Conda conseguirá reproduzir os resultados do notebook e do relatório.***
+
