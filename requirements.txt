@@ -1,6 +1,9 @@
 numpy==2.2.4
 scipy==1.16.2
-matplotlib==3.10.3
+matplotlib==3.9.0
+pandas==2.2.2
+seaborn==0.13.2
+scikit-learn==1.5.2
 pyomo==6.9.5
 ply==3.11
 ipykernel==6.29.5
